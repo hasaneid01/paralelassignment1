@@ -59,7 +59,7 @@ int main() {
     int rps = HEIGHT / size;
 
     struct complex c;
-
+// accoding to the rank each processor has its sub region assigned
     int pointer = rank * rps;
 
     double start_time = MPI_Wtime();
@@ -73,19 +73,19 @@ int main() {
     }
 
     if (rank != 0) {
-        // In the sender (slave) process
+        //slave proceess sending its computations
         MPI_Send(&image[pointer][0], rps * WIDTH, MPI_INT, 0, 1, MPI_COMM_WORLD);
     } else {
-      //  MPI_Barrier(MPI_COMM_WORLD);  // Synchronize processes before printing and saving
+     // master recieving and saving them in primary array
         for (int i = 1; i < size; i++) {
-            // Correct the condition for MPI_Recv
+         
             MPI_Recv(&image[i * rps][0], rps * WIDTH, MPI_INT, i, 1, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
         }
-
+//ending time after recivng all computations and saving them
         double end_time = MPI_Wtime();
         double ttime = end_time - start_time;
 
-        save_pgm("caligulaa.pgm", image);
+        save_pgm("Mandelbrot_static.pgm", image);
         printf("The execution time is: %f s\n", ttime);
     }
 
